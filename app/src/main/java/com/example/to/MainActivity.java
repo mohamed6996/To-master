@@ -9,6 +9,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,6 +22,9 @@ import com.example.to.data.Helper;
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private Helper helper;
+
+    private CustomCursorAdapter mAdapter;
+    RecyclerView mRecyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +42,16 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         helper = new Helper(this);
 
         getLoaderManager().initLoader(1,null,this);
+
+
+        mRecyclerView = (RecyclerView) findViewById(R.id.recyclerview);
+
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        mAdapter = new CustomCursorAdapter(this);
+        mRecyclerView.setAdapter(mAdapter);
+
+
     }
 
 
@@ -74,7 +89,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
 
-        TextView displayView = (TextView) findViewById(R.id.textView);
+        mAdapter.swapCursor(cursor);
+
+      /*  TextView displayView = (TextView) findViewById(R.id.textView);
 
         try {
 
@@ -93,12 +110,13 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             }
         } finally {
             cursor.close();
-        }
+        }*/
 
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
+        mAdapter.swapCursor(null);
 
     }
 }
