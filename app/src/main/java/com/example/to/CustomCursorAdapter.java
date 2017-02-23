@@ -35,29 +35,24 @@ public class CustomCursorAdapter extends RecyclerView.Adapter<CustomCursorAdapte
     public void onBindViewHolder(Vh holder, int position) {
 
 
-        int idIndex = mCursor.getColumnIndex(Contract.ToDoEntry._ID);
+        //   int idIndex = mCursor.getColumnIndex(Contract.ToDoEntry._ID);
         int descriptionIndex = mCursor.getColumnIndex(Contract.ToDoEntry.COLUMN_TITLE);
-
+        int contentIndex = mCursor.getColumnIndex(Contract.ToDoEntry.COLUMN_DESCRIPTION);
         mCursor.moveToPosition(position); // get to the right location in the cursor
 
-        // Determine the values of the wanted data
-     //   final int id = mCursor.getInt(idIndex);
+
         String description = mCursor.getString(descriptionIndex);
-      //  int priority = mCursor.getInt(priorityIndex);
+        String content = mCursor.getString(contentIndex);
 
-        //Set values
-        //   holder.itemView.setTag(id);
-        //   holder.taskDescriptionView.setText(description);
-        holder.textView.setText(description);
+        if (content != null){
+            holder.textView.setText(description+ content);
 
-        // Programmatically set the text and color for the priority TextView
-     //   String priorityString = "" + priority; // converts int to String
-     //   holder.priorityView.setText(priorityString);
+        }else {
+            holder.textView.setText(description);
+        }
 
-     //   GradientDrawable priorityCircle = (GradientDrawable) holder.priorityView.getBackground();
-        // Get the appropriate background color based on the priority
-     //   int priorityColor = getPriorityColor(priority);
-    //    priorityCircle.setColor(priorityColor);
+
+
 
     }
 

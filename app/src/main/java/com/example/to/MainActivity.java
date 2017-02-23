@@ -55,7 +55,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     }
 
 
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
 
@@ -78,7 +77,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
         String[] projection = {
                 Contract.ToDoEntry._ID,
-                Contract.ToDoEntry.COLUMN_TITLE,};
+                Contract.ToDoEntry.COLUMN_TITLE,
+                Contract.ToDoEntry.COLUMN_DESCRIPTION};
 
 
         return new CursorLoader(this, Contract.ToDoEntry.CONTENT_URI,
@@ -90,27 +90,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
 
         mAdapter.swapCursor(cursor);
-
-      /*  TextView displayView = (TextView) findViewById(R.id.textView);
-
-        try {
-
-            // Figure out the index of each column
-            int idColumnIndex = cursor.getColumnIndex(Contract.ToDoEntry._ID);
-            int nameColumnIndex = cursor.getColumnIndex(Contract.ToDoEntry.COLUMN_TITLE);
-
-
-            while (cursor.moveToNext()) {
-                int currentID = cursor.getInt(idColumnIndex);
-                String currentName = cursor.getString(nameColumnIndex);
-
-                displayView.append(("\n" + currentID + " - " +
-                        currentName
-                ));
-            }
-        } finally {
-            cursor.close();
-        }*/
 
     }
 
