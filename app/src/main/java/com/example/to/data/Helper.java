@@ -6,9 +6,6 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import com.example.to.data.Contract.ToDoEntry;
 
-/**
- * Created by lenovo on 2/20/2017.
- */
 
 public class Helper extends SQLiteOpenHelper {
 
@@ -27,7 +24,9 @@ public class Helper extends SQLiteOpenHelper {
         String SQL_CREATE_PETS_TABLE = "CREATE TABLE " + ToDoEntry.TABLE_NAME + " ("
                 + ToDoEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
                 + ToDoEntry.COLUMN_TITLE + " TEXT NOT NULL, "
-                + ToDoEntry.COLUMN_DESCRIPTION + " TEXT); ";
+                + ToDoEntry.COLUMN_DESCRIPTION + " TEXT, "
+                + ToDoEntry.COLUMN_HOUR +" INTEGER, "
+                + ToDoEntry.COLUMN_MINUTE +" INTEGER );";
 
         // Execute the SQL statement
         db.execSQL(SQL_CREATE_PETS_TABLE);
