@@ -4,15 +4,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.support.v7.widget.RecyclerView;
+import android.text.format.Time;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
+import android.widget.Toast;
+
 
 import com.example.to.data.Contract;
 
@@ -21,6 +21,8 @@ public class CustomCursorAdapter extends RecyclerView.Adapter<CustomCursorAdapte
 
     Cursor mCursor;
     private Context mContext;
+
+    long picked_hour;
 
 
     public CustomCursorAdapter(Context mContext) {
@@ -37,11 +39,10 @@ public class CustomCursorAdapter extends RecyclerView.Adapter<CustomCursorAdapte
     public void onBindViewHolder(Vh holder, int position) {
 
 
-
         int descriptionIndex = mCursor.getColumnIndex(Contract.ToDoEntry.COLUMN_TITLE);
         int contentIndex = mCursor.getColumnIndex(Contract.ToDoEntry.COLUMN_DESCRIPTION);
         int picked_hour_index = mCursor.getColumnIndex(Contract.ToDoEntry.COLUMN_HOUR);
-        int picked_minute_index = mCursor.getColumnIndex(Contract.ToDoEntry.COLUMN_MINUTE);
+        //     int picked_minute_index = mCursor.getColumnIndex(Contract.ToDoEntry.COLUMN_MINUTE);
 
 
         mCursor.moveToPosition(position); // get to the right location in the cursor
@@ -49,9 +50,7 @@ public class CustomCursorAdapter extends RecyclerView.Adapter<CustomCursorAdapte
 
         String description = mCursor.getString(descriptionIndex);
         String content = mCursor.getString(contentIndex);
-        int picked_hour = mCursor.getInt(picked_hour_index);
-        int picked_minute = mCursor.getInt(picked_minute_index);
-
+        picked_hour = mCursor.getLong(picked_hour_index);
 
 
         if (content != null) {
@@ -61,40 +60,28 @@ public class CustomCursorAdapter extends RecyclerView.Adapter<CustomCursorAdapte
             holder.textView.setText(description);
         }
 
-        if (picked_hour > 0 && picked_minute > 0){
 
-         //   Toast.makeText(mContext, "" + picked_hour + picked_minute, Toast.LENGTH_LONG).show();
+        long time = System.currentTimeMillis();
 
-            Calendar curunt_calender = Calendar.getInstance();
-            curunt_calender.setTimeInMillis(System.currentTimeMillis());
+        if (picked_hour >= time) {
 
-            final Calendar cal = new GregorianCalendar();
-            cal.add(Calendar.DAY_OF_YEAR, curunt_calender.get(Calendar.DAY_OF_YEAR));
-            cal.set(Calendar.HOUR_OF_DAY, picked_hour);
-            cal.set(Calendar.MINUTE, picked_minute);
-            cal.set(Calendar.SECOND, curunt_calender.get(Calendar.SECOND));
-            cal.set(Calendar.MILLISECOND, curunt_calender.get(Calendar.MILLISECOND));
-            cal.set(Calendar.DATE, curunt_calender.get(Calendar.DATE));
-            cal.set(Calendar.MONTH, curunt_calender.get(Calendar.MONTH));
-
-            long time = cal.getTimeInMillis();
-
-
-            setAlarm(time);
+            setAlarm(picked_hour);
         }
-
-
 
     }
 
     private void setAlarm(long time) {
+
+
         Intent intent = new Intent(mContext, AlarmToastReceiver.class);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, 0, intent, 0);
+        final int _id = (int) System.currentTimeMillis();
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, _id , intent, PendingIntent.FLAG_ONE_SHOT);
 
-        AlarmManager alarmManager = (AlarmManager)mContext.getSystemService(mContext.ALARM_SERVICE);
-        alarmManager.setExact(AlarmManager.RTC_WAKEUP, time, pendingIntent);
+        AlarmManager alarmManager = (AlarmManager) mContext.getSystemService(mContext.ALARM_SERVICE);
+        alarmManager.setExact(AlarmManager.RTC, time, pendingIntent);
+
+
     }
-
 
 
     @Override

@@ -18,20 +18,29 @@ import android.widget.Toast;
 
 import com.example.to.data.Contract;
 import com.example.to.data.Helper;
+import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
+import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 
-public class EditorActivity extends AppCompatActivity implements Listner {
-    private EditText mNameEditText,edt_content;
-    FloatingActionButton fab,fabTime;
-    int hour , minute;
+public class EditorActivity extends AppCompatActivity implements TimePickerDialog.OnTimeSetListener, DatePickerDialog.OnDateSetListener {
+    private EditText mNameEditText, edt_content;
+    FloatingActionButton fab, fabTime;
+    int year, monthOfYear, dayOfMonth;
+    int hourOfDay, minute, second;
+    ContentValues values;
+
+   static long time;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_editor);
+
+        values = new ContentValues();
+
         mNameEditText = (EditText) findViewById(R.id.editText);
         edt_content = (EditText) findViewById(R.id.edtContent);
         fab = (FloatingActionButton) findViewById(R.id.floatingActionButton2);
@@ -40,7 +49,7 @@ public class EditorActivity extends AppCompatActivity implements Listner {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                insertPet();
+               insertPet();
                 finish();
             }
         });
@@ -48,15 +57,21 @@ public class EditorActivity extends AppCompatActivity implements Listner {
         fabTime.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                DialogFragment newFragment = new TimePickerFragment();
-                newFragment.show(getSupportFragmentManager(), "timePicker");
+                Calendar now = Calendar.getInstance();
+                DatePickerDialog dpd = DatePickerDialog.newInstance(
+                        EditorActivity.this,
+                        now.get(Calendar.YEAR),
+                        now.get(Calendar.MONTH),
+                        now.get(Calendar.DAY_OF_MONTH)
+                );
+                dpd.show(getFragmentManager(), "Datepickerdialog");
+                dpd.setVersion(DatePickerDialog.Version.VERSION_1);
+                dpd.setThemeDark(true);
             }
         });
 
 
     }
-
-
 
 
     private void insertPet() {
@@ -67,13 +82,11 @@ public class EditorActivity extends AppCompatActivity implements Listner {
         Helper mDbHelper = new Helper(this);
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
 
-        ContentValues values = new ContentValues();
         values.put(Contract.ToDoEntry.COLUMN_TITLE, nameString);
         values.put(Contract.ToDoEntry.COLUMN_DESCRIPTION, contentString);
-        values.put(Contract.ToDoEntry.COLUMN_HOUR,hour);
-        values.put(Contract.ToDoEntry.COLUMN_MINUTE,minute);
+        values.put(Contract.ToDoEntry.COLUMN_HOUR,time);
 
-        getContentResolver().insert(Contract.ToDoEntry.CONTENT_URI,values);
+        getContentResolver().insert(Contract.ToDoEntry.CONTENT_URI, values);
 
 
     }
@@ -88,45 +101,66 @@ public class EditorActivity extends AppCompatActivity implements Listner {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_save:
-                insertPet();
-                finish();
+            //    insertPet();
+            //    finish();
                 return true;
 
         }
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public void picked_time(int hour, int minute) {
 
-        this.hour = hour;
-        this.minute = minute;
+    @Override
+    public void onDateSet(DatePickerDialog view, int year, int monthOfYear, int dayOfMonth) {
+        this.year = year;
+        this.monthOfYear = monthOfYear;
+        this.dayOfMonth = dayOfMonth;
+
+        time_picker();
+
     }
 
-     /*   Calendar curunt_calender = Calendar.getInstance();
+    public void time_picker() {
+        Calendar n = Calendar.getInstance();
+        TimePickerDialog t = TimePickerDialog.newInstance(EditorActivity.this, n.get(Calendar.HOUR_OF_DAY),
+                n.get(Calendar.MINUTE),
+                true);
+        t.show(getFragmentManager(), "timepickerdialog");
+        t.setVersion(TimePickerDialog.Version.VERSION_1);
+        t.setThemeDark(true);
+
+    }
+
+    @Override
+    public void onTimeSet(TimePickerDialog view, int hourOfDay, int minute, int second) {
+
+        this.hourOfDay = hourOfDay;
+        this.minute = minute;
+        this.second = second;
+
+        setCalender();
+
+    }
+
+    public void setCalender() {
+        Calendar curunt_calender = Calendar.getInstance();
         curunt_calender.setTimeInMillis(System.currentTimeMillis());
 
         final Calendar cal = new GregorianCalendar();
-        cal.add(Calendar.DAY_OF_YEAR, curunt_calender.get(Calendar.DAY_OF_YEAR));
-        cal.set(Calendar.HOUR_OF_DAY, hour);
-        cal.set(Calendar.MINUTE, minute);
-        cal.set(Calendar.SECOND, curunt_calender.get(Calendar.SECOND));
-        cal.set(Calendar.MILLISECOND, curunt_calender.get(Calendar.MILLISECOND));
-        cal.set(Calendar.DATE, curunt_calender.get(Calendar.DATE));
-        cal.set(Calendar.MONTH, curunt_calender.get(Calendar.MONTH));
+        cal.set(Calendar.YEAR, year);
+        cal.set(Calendar.MONTH, monthOfYear);
+        cal.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+        cal.set(Calendar.HOUR_OF_DAY, this.hourOfDay);
+        cal.set(Calendar.MINUTE, this.minute);
+        cal.set(Calendar.SECOND, this.second);
 
-        long time = cal.getTimeInMillis();
+        time =  cal.getTimeInMillis();
 
+       // insertPet(time);
 
-        setAlarm(time);
 
     }
 
-    private void setAlarm(long time) {
-        Intent intent = new Intent(this, AlarmToastReceiver.class);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
 
-        AlarmManager alarmManager = (AlarmManager) getSystemService(this.ALARM_SERVICE);
-        alarmManager.setExact(AlarmManager.RTC_WAKEUP, time, pendingIntent);
-    }*/
+
 }
